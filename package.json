@@ -6,7 +6,6 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "postinstall": "pnpm -w --filter api run db:generate",
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
