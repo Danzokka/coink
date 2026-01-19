@@ -1,4 +1,13 @@
-import { IsString, IsOptional, IsEnum, IsBoolean, IsUUID, IsNotEmpty, Length, Matches } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsBoolean,
+  IsUUID,
+  IsNotEmpty,
+  Length,
+  Matches,
+} from 'class-validator';
 import { TransactionType } from '@prisma/client';
 
 export class CreateCategoryDto {
@@ -14,7 +23,9 @@ export class CreateCategoryDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^#[0-9A-F]{6}$/i, { message: 'Color must be a valid hex color (e.g., #FF0000)' })
+  @Matches(/^#[0-9A-F]{6}$/i, {
+    message: 'Color must be a valid hex color (e.g., #FF0000)',
+  })
   color?: string;
 
   @IsOptional()
@@ -44,7 +55,9 @@ export class UpdateCategoryDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^#[0-9A-F]{6}$/i, { message: 'Color must be a valid hex color (e.g., #FF0000)' })
+  @Matches(/^#[0-9A-F]{6}$/i, {
+    message: 'Color must be a valid hex color (e.g., #FF0000)',
+  })
   color?: string;
 
   @IsOptional()

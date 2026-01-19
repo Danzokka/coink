@@ -80,7 +80,7 @@ describe('TransactionController (e2e)', () => {
     it('should create a simple income transaction', async () => {
       const createTransactionDto = {
         description: 'Freelance payment',
-        amount: 1500.00,
+        amount: 1500.0,
         type: 'INCOME',
         paymentMethod: 'PIX',
         categoryId: incomeCategory.id,
@@ -105,13 +105,13 @@ describe('TransactionController (e2e)', () => {
     it('should create an expense transaction with interest and tax', async () => {
       const createTransactionDto = {
         description: 'Personal loan',
-        amount: 1000.00,
+        amount: 1000.0,
         type: 'EXPENSE',
         paymentMethod: 'LOAN',
         categoryId: expenseCategory.id,
         interestRate: 10.0,
         taxRate: 2.0,
-        originalAmount: 1000.00,
+        originalAmount: 1000.0,
       };
 
       const response = await request(app.getHttpServer())
@@ -120,7 +120,9 @@ describe('TransactionController (e2e)', () => {
         .send(createTransactionDto)
         .expect(201);
 
-      expect(response.body.interestRate).toBe(createTransactionDto.interestRate);
+      expect(response.body.interestRate).toBe(
+        createTransactionDto.interestRate,
+      );
       expect(response.body.taxRate).toBe(createTransactionDto.taxRate);
       // Amount should be calculated: 1000 * 1.10 * 1.02 = 1122
       expect(Number(response.body.amount)).toBe(1122);
@@ -129,7 +131,7 @@ describe('TransactionController (e2e)', () => {
     it('should create a recurring transaction', async () => {
       const createTransactionDto = {
         description: 'Monthly salary',
-        amount: 5000.00,
+        amount: 5000.0,
         type: 'INCOME',
         paymentMethod: 'BANK_TRANSFER',
         categoryId: incomeCategory.id,
@@ -150,7 +152,7 @@ describe('TransactionController (e2e)', () => {
     it('should fail with invalid category', async () => {
       const createTransactionDto = {
         description: 'Invalid category test',
-        amount: 100.00,
+        amount: 100.0,
         type: 'EXPENSE',
         paymentMethod: 'CASH',
         categoryId: 'invalid-category-id',
@@ -166,7 +168,7 @@ describe('TransactionController (e2e)', () => {
     it('should fail without authentication', async () => {
       const createTransactionDto = {
         description: 'Test transaction',
-        amount: 100.00,
+        amount: 100.0,
         type: 'EXPENSE',
         paymentMethod: 'CASH',
         categoryId: expenseCategory.id,
@@ -183,7 +185,7 @@ describe('TransactionController (e2e)', () => {
     it('should create installment transactions', async () => {
       const createInstallmentDto = {
         description: 'iPhone 15 Pro',
-        amount: 6000.00,
+        amount: 6000.0,
         type: 'EXPENSE',
         paymentMethod: 'CREDIT_CARD',
         categoryId: expenseCategory.id,
@@ -218,7 +220,7 @@ describe('TransactionController (e2e)', () => {
     it('should fail to create installments with invalid installment count', async () => {
       const createInstallmentDto = {
         description: 'Invalid installments',
-        amount: 1000.00,
+        amount: 1000.0,
         type: 'EXPENSE',
         paymentMethod: 'CREDIT_CARD',
         categoryId: expenseCategory.id,
@@ -282,9 +284,7 @@ describe('TransactionController (e2e)', () => {
     });
 
     it('should fail without authentication', async () => {
-      await request(app.getHttpServer())
-        .get('/transactions')
-        .expect(401);
+      await request(app.getHttpServer()).get('/transactions').expect(401);
     });
   });
 
@@ -350,7 +350,7 @@ describe('TransactionController (e2e)', () => {
     it('should update a transaction', async () => {
       const updateDto = {
         description: 'Updated freelance payment',
-        amount: 1800.00,
+        amount: 1800.0,
       };
 
       const response = await request(app.getHttpServer())
@@ -386,10 +386,10 @@ describe('TransactionController (e2e)', () => {
     it('should mark installment as paid', async () => {
       // Get an unpaid installment transaction
       const installmentTransaction = await prisma.transaction.findFirst({
-        where: { 
-          installmentGroupId, 
-          userId, 
-          isPaid: false 
+        where: {
+          installmentGroupId,
+          userId,
+          isPaid: false,
         },
       });
 

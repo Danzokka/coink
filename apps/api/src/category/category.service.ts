@@ -50,7 +50,7 @@ export class CategoryService {
 
   async findAll(userId: string, type?: TransactionType) {
     const whereClause: any = { userId };
-    
+
     if (type) {
       whereClause.type = type;
     }
@@ -74,10 +74,7 @@ export class CategoryService {
           },
         },
       },
-      orderBy: [
-        { isDefault: 'desc' },
-        { name: 'asc' },
-      ],
+      orderBy: [{ isDefault: 'desc' }, { name: 'asc' }],
     });
   }
 
@@ -110,12 +107,19 @@ export class CategoryService {
     return category;
   }
 
-  async update(userId: string, id: string, updateCategoryDto: UpdateCategoryDto) {
+  async update(
+    userId: string,
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ) {
     // Check if category exists and belongs to user
     const existingCategory = await this.findOne(userId, id);
 
     // Check if trying to update name and if it would conflict
-    if (updateCategoryDto.name && updateCategoryDto.name !== existingCategory.name) {
+    if (
+      updateCategoryDto.name &&
+      updateCategoryDto.name !== existingCategory.name
+    ) {
       const conflictCategory = await this.prisma.category.findFirst({
         where: {
           name: updateCategoryDto.name,
@@ -133,7 +137,10 @@ export class CategoryService {
     }
 
     // Don't allow updating default categories to non-default
-    if (existingCategory.isDefault && updateCategoryDto.hasOwnProperty('isDefault')) {
+    if (
+      existingCategory.isDefault &&
+      updateCategoryDto.hasOwnProperty('isDefault')
+    ) {
       throw new ForbiddenException('Cannot modify default category status');
     }
 
@@ -179,24 +186,87 @@ export class CategoryService {
 
   async createDefaultCategories(userId: string) {
     const defaultIncomeCategories = [
-      { name: 'Salário', description: 'Salário mensal', color: '#4CAF50', icon: 'salary' },
-      { name: 'Freelance', description: 'Trabalhos freelance', color: '#2196F3', icon: 'freelance' },
-      { name: 'Investimentos', description: 'Rendimentos de investimentos', color: '#FF9800', icon: 'investment' },
-      { name: 'Outros', description: 'Outras receitas', color: '#9E9E9E', icon: 'other' },
+      {
+        name: 'Salário',
+        description: 'Salário mensal',
+        color: '#4CAF50',
+        icon: 'salary',
+      },
+      {
+        name: 'Freelance',
+        description: 'Trabalhos freelance',
+        color: '#2196F3',
+        icon: 'freelance',
+      },
+      {
+        name: 'Investimentos',
+        description: 'Rendimentos de investimentos',
+        color: '#FF9800',
+        icon: 'investment',
+      },
+      {
+        name: 'Outros',
+        description: 'Outras receitas',
+        color: '#9E9E9E',
+        icon: 'other',
+      },
     ];
 
     const defaultExpenseCategories = [
-      { name: 'Alimentação', description: 'Supermercado, restaurantes', color: '#F44336', icon: 'food' },
-      { name: 'Transporte', description: 'Combustível, transporte público', color: '#3F51B5', icon: 'transport' },
-      { name: 'Moradia', description: 'Aluguel, contas da casa', color: '#795548', icon: 'home' },
-      { name: 'Saúde', description: 'Médico, farmácia, plano de saúde', color: '#E91E63', icon: 'health' },
-      { name: 'Educação', description: 'Cursos, livros, material', color: '#9C27B0', icon: 'education' },
-      { name: 'Lazer', description: 'Cinema, jogos, hobbies', color: '#00BCD4', icon: 'entertainment' },
-      { name: 'Roupas', description: 'Vestuário e acessórios', color: '#607D8B', icon: 'clothing' },
-      { name: 'Outros', description: 'Outras despesas', color: '#9E9E9E', icon: 'other' },
+      {
+        name: 'Alimentação',
+        description: 'Supermercado, restaurantes',
+        color: '#F44336',
+        icon: 'food',
+      },
+      {
+        name: 'Transporte',
+        description: 'Combustível, transporte público',
+        color: '#3F51B5',
+        icon: 'transport',
+      },
+      {
+        name: 'Moradia',
+        description: 'Aluguel, contas da casa',
+        color: '#795548',
+        icon: 'home',
+      },
+      {
+        name: 'Saúde',
+        description: 'Médico, farmácia, plano de saúde',
+        color: '#E91E63',
+        icon: 'health',
+      },
+      {
+        name: 'Educação',
+        description: 'Cursos, livros, material',
+        color: '#9C27B0',
+        icon: 'education',
+      },
+      {
+        name: 'Lazer',
+        description: 'Cinema, jogos, hobbies',
+        color: '#00BCD4',
+        icon: 'entertainment',
+      },
+      {
+        name: 'Roupas',
+        description: 'Vestuário e acessórios',
+        color: '#607D8B',
+        icon: 'clothing',
+      },
+      {
+        name: 'Outros',
+        description: 'Outras despesas',
+        color: '#9E9E9E',
+        icon: 'other',
+      },
     ];
 
-    const createCategories = async (categories: any[], type: TransactionType) => {
+    const createCategories = async (
+      categories: any[],
+      type: TransactionType,
+    ) => {
       for (const category of categories) {
         await this.prisma.category.create({
           data: {

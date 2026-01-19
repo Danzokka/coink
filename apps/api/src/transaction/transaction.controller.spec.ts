@@ -137,10 +137,18 @@ describe('TransactionController', () => {
 
       mockTransactionService.update.mockResolvedValue(mockUpdatedTransaction);
 
-      const result = await controller.update(transactionId, updateDto, mockUser);
+      const result = await controller.update(
+        transactionId,
+        updateDto,
+        mockUser,
+      );
 
       expect(result).toEqual(mockUpdatedTransaction);
-      expect(service.update).toHaveBeenCalledWith(transactionId, 'user-id', updateDto);
+      expect(service.update).toHaveBeenCalledWith(
+        transactionId,
+        'user-id',
+        updateDto,
+      );
     });
   });
 
@@ -174,7 +182,9 @@ describe('TransactionController', () => {
         userId: 'user-id',
       };
 
-      mockTransactionService.updatePaymentStatus.mockResolvedValue(mockTransaction);
+      mockTransactionService.updatePaymentStatus.mockResolvedValue(
+        mockTransaction,
+      );
 
       const result = await controller.updatePaymentStatus(
         transactionId,
@@ -215,7 +225,9 @@ describe('TransactionController', () => {
         },
       };
 
-      mockTransactionService.getDashboardData.mockResolvedValue(mockDashboardData);
+      mockTransactionService.getDashboardData.mockResolvedValue(
+        mockDashboardData,
+      );
 
       const result = await controller.getDashboard(mockUser);
 
@@ -287,12 +299,17 @@ describe('TransactionController', () => {
         ],
       };
 
-      mockTransactionService.getInstallmentGroup.mockResolvedValue(mockInstallmentGroup);
+      mockTransactionService.getInstallmentGroup.mockResolvedValue(
+        mockInstallmentGroup,
+      );
 
       const result = await controller.getInstallmentGroup(groupId, mockUser);
 
       expect(result).toEqual(mockInstallmentGroup);
-      expect(service.getInstallmentGroup).toHaveBeenCalledWith(groupId, 'user-id');
+      expect(service.getInstallmentGroup).toHaveBeenCalledWith(
+        groupId,
+        'user-id',
+      );
     });
   });
 
@@ -302,12 +319,17 @@ describe('TransactionController', () => {
       const mockUser = { id: 'user-id' };
       const mockResult = { deletedCount: 3 };
 
-      mockTransactionService.deleteInstallmentGroup.mockResolvedValue(mockResult);
+      mockTransactionService.deleteInstallmentGroup.mockResolvedValue(
+        mockResult,
+      );
 
       const result = await controller.deleteInstallmentGroup(groupId, mockUser);
 
       expect(result).toEqual(mockResult);
-      expect(service.deleteInstallmentGroup).toHaveBeenCalledWith(groupId, 'user-id');
+      expect(service.deleteInstallmentGroup).toHaveBeenCalledWith(
+        groupId,
+        'user-id',
+      );
     });
   });
 });

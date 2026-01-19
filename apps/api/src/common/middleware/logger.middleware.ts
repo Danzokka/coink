@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
   private readonly logger = new Logger('HTTP');
-  
+
   constructor(private readonly jwtService: JwtService) {}
 
   use(req: Request, res: Response, next: NextFunction): void {
@@ -17,7 +17,7 @@ export class LoggerMiddleware implements NestMiddleware {
     // Tentar extrair informações do usuário do token JWT
     let userId = 'anonymous';
     let userEmail = 'anonymous';
-    
+
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
@@ -34,7 +34,7 @@ export class LoggerMiddleware implements NestMiddleware {
 
     // Log da requisição inicial
     this.logger.log(
-      `📥 ${method} ${originalUrl} - User: ${userEmail} (${userId}) - IP: ${ip} - UA: ${userAgent}`
+      `📥 ${method} ${originalUrl} - User: ${userEmail} (${userId}) - IP: ${ip} - UA: ${userAgent}`,
     );
 
     // Log adicional para dados da requisição (sem senhas)
@@ -43,7 +43,11 @@ export class LoggerMiddleware implements NestMiddleware {
       this.logger.debug(`📦 Body: ${JSON.stringify(sanitizedBody)}`);
     }
 
-    if (params && typeof params === 'object' && Object.keys(params).length > 0) {
+    if (
+      params &&
+      typeof params === 'object' &&
+      Object.keys(params).length > 0
+    ) {
       this.logger.debug(`🎯 Params: ${JSON.stringify(params)}`);
     }
 
@@ -56,13 +60,17 @@ export class LoggerMiddleware implements NestMiddleware {
     res.send = function (body) {
       const duration = Date.now() - startTime;
       const contentLength = Buffer.byteLength(body || '');
-      
+
       const statusCode = res.statusCode;
-      const statusEmoji = statusCode >= 200 && statusCode < 300 ? '✅' : 
-                         statusCode >= 400 && statusCode < 500 ? '⚠️' : '❌';
+      const statusEmoji =
+        statusCode >= 200 && statusCode < 300
+          ? '✅'
+          : statusCode >= 400 && statusCode < 500
+            ? '⚠️'
+            : '❌';
 
       this.logger.log(
-        `📤 ${method} ${originalUrl} ${statusEmoji} ${statusCode} - ${duration}ms - ${contentLength} bytes - User: ${userEmail}`
+        `📤 ${method} ${originalUrl} ${statusEmoji} ${statusCode} - ${duration}ms - ${contentLength} bytes - User: ${userEmail}`,
       );
 
       // Log de erro se status >= 400
@@ -82,10 +90,15 @@ export class LoggerMiddleware implements NestMiddleware {
   }
 
   private sanitizeBody(body: any): any {
-    const sensitiveFields = ['password', 'currentPassword', 'newPassword', 'token'];
+    const sensitiveFields = [
+      'password',
+      'currentPassword',
+      'newPassword',
+      'token',
+    ];
     const sanitized = { ...body };
 
-    sensitiveFields.forEach(field => {
+    sensitiveFields.forEach((field) => {
       if (sanitized[field]) {
         sanitized[field] = '***REDACTED***';
       }

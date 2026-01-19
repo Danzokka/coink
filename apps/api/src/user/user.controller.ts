@@ -73,7 +73,11 @@ export class UserController {
 
   @Patch('profile/me')
   @UseGuards(AuthGuard)
-  async updateProfile(@Request() req: any, @Body() updateUserDto: UpdateUserDto, @Ip() ip: string) {
+  async updateProfile(
+    @Request() req: any,
+    @Body() updateUserDto: UpdateUserDto,
+    @Ip() ip: string,
+  ) {
     const userAgent = req.headers['user-agent'] || 'unknown';
     return this.userService.update(req.user.id, updateUserDto, ip, userAgent);
   }
@@ -86,7 +90,12 @@ export class UserController {
     @Ip() ip: string,
   ) {
     const userAgent = req.headers['user-agent'] || 'unknown';
-    return this.userService.updatePassword(req.user.id, updatePasswordDto, ip, userAgent);
+    return this.userService.updatePassword(
+      req.user.id,
+      updatePasswordDto,
+      ip,
+      userAgent,
+    );
   }
 
   @Delete('profile/me')

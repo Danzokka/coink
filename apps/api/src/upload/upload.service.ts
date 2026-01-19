@@ -26,48 +26,52 @@ export class UploadService {
     try {
       // Validar formato base64
       if (!uploadPhotoDto.photoBase64.startsWith('data:image/')) {
-        throw new BadRequestException('Formato de imagem inválido. Use base64 com data URL.');
+        throw new BadRequestException(
+          'Formato de imagem inválido. Use base64 com data URL.',
+        );
       }
 
       // Extrair informações da imagem
       const [header, base64Data] = uploadPhotoDto.photoBase64.split(',');
       const mimeType = header.match(/data:([^;]+)/)?.[1];
-      
+
       if (!mimeType || !this.ALLOWED_TYPES.includes(mimeType)) {
         await this.eventsService.logPhotoUploadEvent(
           userId,
           sessionId,
           false,
-          { 
+          {
             error: 'Tipo de arquivo não permitido',
             fileName: uploadPhotoDto.fileName,
-            mimeType 
+            mimeType,
           },
           ip,
           userAgent,
         );
-        
-        throw new BadRequestException('Tipo de arquivo não permitido. Use JPEG, PNG ou WebP.');
+
+        throw new BadRequestException(
+          'Tipo de arquivo não permitido. Use JPEG, PNG ou WebP.',
+        );
       }
 
       // Calcular tamanho aproximado (base64 é ~33% maior que binário)
       const estimatedSize = (base64Data.length * 3) / 4;
-      
+
       if (estimatedSize > this.MAX_SIZE) {
         await this.eventsService.logPhotoUploadEvent(
           userId,
           sessionId,
           false,
-          { 
+          {
             error: 'Arquivo muito grande',
             fileName: uploadPhotoDto.fileName,
             estimatedSize,
-            maxSize: this.MAX_SIZE 
+            maxSize: this.MAX_SIZE,
           },
           ip,
           userAgent,
         );
-        
+
         throw new BadRequestException('Arquivo muito grande. Máximo 5MB.');
       }
 
@@ -106,7 +110,6 @@ export class UploadService {
         message: 'Foto do perfil atualizada com sucesso',
         user: updatedUser,
       };
-
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
@@ -127,7 +130,9 @@ export class UploadService {
         userAgent,
       });
 
-      this.logger.error(`Failed to upload photo for user ${userId}: ${error.message}`);
+      this.logger.error(
+        `Failed to upload photo for user ${userId}: ${error.message}`,
+      );
       throw new BadRequestException('Erro interno do servidor');
     }
   }
@@ -169,9 +174,10 @@ export class UploadService {
         message: 'Foto do perfil removida com sucesso',
         user: updatedUser,
       };
-
     } catch (error) {
-      this.logger.error(`Failed to delete photo for user ${userId}: ${error.message}`);
+      this.logger.error(
+        `Failed to delete photo for user ${userId}: ${error.message}`,
+      );
       throw new BadRequestException('Erro interno do servidor');
     }
   }
@@ -187,9 +193,10 @@ export class UploadService {
         success: true,
         profilePhoto: user?.profilePhoto || null,
       };
-
     } catch (error) {
-      this.logger.error(`Failed to get photo for user ${userId}: ${error.message}`);
+      this.logger.error(
+        `Failed to get photo for user ${userId}: ${error.message}`,
+      );
       throw new BadRequestException('Erro interno do servidor');
     }
   }

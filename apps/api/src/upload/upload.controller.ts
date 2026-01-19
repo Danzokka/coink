@@ -28,7 +28,7 @@ export class UploadController {
     @Ip() ip: string,
   ) {
     const userAgent = req.headers['user-agent'] || 'unknown';
-    
+
     return this.uploadService.uploadUserPhoto(
       req.user.id,
       uploadPhotoDto,
@@ -45,7 +45,7 @@ export class UploadController {
     @Ip() ip: string,
   ) {
     const userAgent = req.headers['user-agent'] || 'unknown';
-    
+
     return this.uploadService.deleteUserPhoto(
       req.user.id,
       deletePhotoDto,

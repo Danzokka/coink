@@ -71,17 +71,17 @@ export class CreateTransactionDto {
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
-  @Transform(({ value }) => value ? parseFloat(value) : undefined)
+  @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   interestRate?: number;
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
-  @Transform(({ value }) => value ? parseFloat(value) : undefined)
+  @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   taxRate?: number;
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
-  @Transform(({ value }) => value ? parseFloat(value) : undefined)
+  @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   originalAmount?: number;
 }
 
@@ -94,7 +94,7 @@ export class UpdateTransactionDto {
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
-  @Transform(({ value }) => value ? parseFloat(value) : undefined)
+  @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   amount?: number;
 
   @IsOptional()
@@ -133,17 +133,17 @@ export class UpdateTransactionDto {
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
-  @Transform(({ value }) => value ? parseFloat(value) : undefined)
+  @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   interestRate?: number;
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
-  @Transform(({ value }) => value ? parseFloat(value) : undefined)
+  @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   taxRate?: number;
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
-  @Transform(({ value }) => value ? parseFloat(value) : undefined)
+  @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   originalAmount?: number;
 }
 
@@ -158,7 +158,7 @@ export class CreateInstallmentTransactionDto extends CreateTransactionDto {
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
-  @Transform(({ value }) => value ? parseFloat(value) : undefined)
+  @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   downPayment?: number; // Entrada
 }
 
@@ -187,14 +187,14 @@ export class TransactionFilterDto {
   @IsInt()
   @Min(1)
   @Max(12)
-  @Transform(({ value }) => value ? parseInt(value) : undefined)
+  @Transform(({ value }) => (value ? parseInt(value) : undefined))
   month?: number;
 
   @IsOptional()
   @IsInt()
   @Min(2000)
   @Max(2100)
-  @Transform(({ value }) => value ? parseInt(value) : undefined)
+  @Transform(({ value }) => (value ? parseInt(value) : undefined))
   year?: number;
 
   @IsOptional()
@@ -212,14 +212,14 @@ export class TransactionFilterDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  @Transform(({ value }) => value ? parseInt(value) : 1)
+  @Transform(({ value }) => (value ? parseInt(value) : 1))
   page?: number = 1;
 
   @IsOptional()
   @IsInt()
   @Min(1)
   @Max(100)
-  @Transform(({ value }) => value ? parseInt(value) : 20)
+  @Transform(({ value }) => (value ? parseInt(value) : 20))
   limit?: number = 20;
 }
 

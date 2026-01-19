@@ -76,7 +76,7 @@ describe('CategoryController (e2e)', () => {
       expect(response.body.name).toBe(createCategoryDto.name);
       expect(response.body.type).toBe(createCategoryDto.type);
       expect(response.body.userId).toBe(userId);
-      
+
       categoryId = response.body.id; // Store for later tests
     });
 
@@ -163,9 +163,7 @@ describe('CategoryController (e2e)', () => {
     });
 
     it('should fail without authentication', async () => {
-      await request(app.getHttpServer())
-        .get('/categories')
-        .expect(401);
+      await request(app.getHttpServer()).get('/categories').expect(401);
     });
   });
 
@@ -231,8 +229,8 @@ describe('CategoryController (e2e)', () => {
       // Check that default categories were created
       const categories = await prisma.category.findMany({ where: { userId } });
       expect(categories.length).toBeGreaterThan(0);
-      
-      const defaultCategories = categories.filter(c => c.isDefault);
+
+      const defaultCategories = categories.filter((c) => c.isDefault);
       expect(defaultCategories.length).toBeGreaterThan(0);
     });
   });

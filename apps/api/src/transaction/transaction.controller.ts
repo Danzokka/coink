@@ -25,7 +25,10 @@ export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
   @Post()
-  create(@Request() req: any, @Body() createTransactionDto: CreateTransactionDto) {
+  create(
+    @Request() req: any,
+    @Body() createTransactionDto: CreateTransactionDto,
+  ) {
     return this.transactionService.create(req.user.id, createTransactionDto);
   }
 
@@ -69,10 +72,7 @@ export class TransactionController {
   }
 
   @Get('installments/:groupId')
-  findInstallmentGroup(
-    @Request() req: any,
-    @Param('groupId') groupId: string,
-  ) {
+  findInstallmentGroup(@Request() req: any, @Param('groupId') groupId: string) {
     return this.transactionService.findInstallmentGroup(req.user.id, groupId);
   }
 
@@ -87,7 +87,11 @@ export class TransactionController {
     @Param('id') id: string,
     @Body() updateTransactionDto: UpdateTransactionDto,
   ) {
-    return this.transactionService.update(req.user.id, id, updateTransactionDto);
+    return this.transactionService.update(
+      req.user.id,
+      id,
+      updateTransactionDto,
+    );
   }
 
   @Patch(':id/payment-status')
@@ -96,7 +100,11 @@ export class TransactionController {
     @Param('id') id: string,
     @Body('isPaid') isPaid: boolean,
   ) {
-    return this.transactionService.markInstallmentAsPaid(req.user.id, id, isPaid);
+    return this.transactionService.markInstallmentAsPaid(
+      req.user.id,
+      id,
+      isPaid,
+    );
   }
 
   @Delete(':id')

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Providers from './providers'
-import { Toaster } from '@/components/ui/sonner'
+import Providers from "./providers";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,7 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Coink - Gerenciamento Financeiro",
-  description: "Simplifique o gerenciamento de suas finanças pessoais com categorização inteligente e insights valiosos",
+  description:
+    "Simplifique o gerenciamento de suas finanças pessoais com categorização inteligente e insights valiosos",
 };
 
 export default function RootLayout({

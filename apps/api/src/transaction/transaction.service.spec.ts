@@ -179,7 +179,9 @@ describe('TransactionService', () => {
       ];
 
       mockPrismaService.transaction.count.mockResolvedValue(2);
-      mockPrismaService.transaction.findMany.mockResolvedValue(mockTransactions);
+      mockPrismaService.transaction.findMany.mockResolvedValue(
+        mockTransactions,
+      );
 
       const result = await service.findAll('user-id', {
         page: 1,
@@ -280,9 +282,15 @@ describe('TransactionService', () => {
         category: { name: 'Food' },
       };
 
-      mockPrismaService.transaction.update.mockResolvedValue(mockUpdatedTransaction);
+      mockPrismaService.transaction.update.mockResolvedValue(
+        mockUpdatedTransaction,
+      );
 
-      const result = await service.update('transaction-id', 'user-id', updateDto);
+      const result = await service.update(
+        'transaction-id',
+        'user-id',
+        updateDto,
+      );
 
       expect(result).toEqual(mockUpdatedTransaction);
       expect(mockPrismaService.transaction.update).toHaveBeenCalledWith({
@@ -338,7 +346,11 @@ describe('TransactionService', () => {
 
       mockPrismaService.transaction.update.mockResolvedValue(mockTransaction);
 
-      const result = await service.updatePaymentStatus('transaction-id', 'user-id', true);
+      const result = await service.updatePaymentStatus(
+        'transaction-id',
+        'user-id',
+        true,
+      );
 
       expect(result).toEqual(mockTransaction);
       expect(mockPrismaService.transaction.update).toHaveBeenCalledWith({

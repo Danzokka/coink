@@ -1,17 +1,21 @@
-import { 
-  Controller, 
-  Post, 
-  Get, 
-  Body, 
-  Query, 
-  UseGuards, 
-  Req, 
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Query,
+  UseGuards,
+  Req,
   Ip,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
-import { CreateEventDto, CreateEventsDto, EventQueryDto } from './dto/event.dto';
+import {
+  CreateEventDto,
+  CreateEventsDto,
+  EventQueryDto,
+} from './dto/event.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RequestAuthGuard } from '../auth/guards/auth.guard';
 
@@ -28,7 +32,7 @@ export class EventsController {
     @Ip() ip: string,
   ) {
     const userAgent = req.headers['user-agent'] || 'unknown';
-    
+
     return this.eventsService.createEvent(
       req.user.id,
       createEventDto,
@@ -45,7 +49,7 @@ export class EventsController {
     @Ip() ip: string,
   ) {
     const userAgent = req.headers['user-agent'] || 'unknown';
-    
+
     return this.eventsService.createEvents(
       req.user.id,
       createEventsDto,
@@ -76,7 +80,7 @@ export class EventsController {
     @Ip() ip: string,
   ) {
     const userAgent = req.headers['user-agent'] || 'unknown';
-    
+
     return this.eventsService.logLoginEvent(
       req.user.id,
       body.sessionId,
@@ -95,7 +99,7 @@ export class EventsController {
     @Ip() ip: string,
   ) {
     const userAgent = req.headers['user-agent'] || 'unknown';
-    
+
     return this.eventsService.logPhotoUploadEvent(
       req.user.id,
       body.sessionId,
@@ -114,7 +118,7 @@ export class EventsController {
     @Ip() ip: string,
   ) {
     const userAgent = req.headers['user-agent'] || 'unknown';
-    
+
     return this.eventsService.logNavigationEvent(
       req.user.id,
       body.sessionId,
@@ -133,7 +137,7 @@ export class EventsController {
     @Ip() ip: string,
   ) {
     const userAgent = req.headers['user-agent'] || 'unknown';
-    
+
     return this.eventsService.logActionEvent(
       req.user.id,
       body.sessionId,

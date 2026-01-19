@@ -12,7 +12,11 @@ import {
   UpdateUserPasswordDto,
 } from './dto/user.dto';
 import { EventsService } from '../events/events.service';
-import { UserEmailUpdatedEvent, UserPasswordUpdatedEvent, UserProfileUpdatedEvent } from '../events/interfaces/event.interfaces';
+import {
+  UserEmailUpdatedEvent,
+  UserPasswordUpdatedEvent,
+  UserProfileUpdatedEvent,
+} from '../events/interfaces/event.interfaces';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -98,7 +102,12 @@ export class UserService {
     });
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto, ip?: string, userAgent?: string) {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    ip?: string,
+    userAgent?: string,
+  ) {
     // Verificar se o usuário existe
     const existingUser = await this.findOne(id);
 
@@ -138,7 +147,7 @@ export class UserService {
 
     if (updateUserDto.email && updateUserDto.email !== existingUser.email) {
       changes.push('email');
-      
+
       // Emitir evento específico de email atualizado
       this.eventsService.emitUserEmailUpdated({
         userId: id,
@@ -167,7 +176,12 @@ export class UserService {
     return user;
   }
 
-  async updatePassword(id: string, updatePasswordDto: UpdateUserPasswordDto, ip?: string, userAgent?: string) {
+  async updatePassword(
+    id: string,
+    updatePasswordDto: UpdateUserPasswordDto,
+    ip?: string,
+    userAgent?: string,
+  ) {
     // Buscar usuário com senha
     const user = await this.prisma.user.findUnique({
       where: { id },
@@ -193,7 +207,7 @@ export class UserService {
         ip,
         userAgent,
       });
-      
+
       throw new UnauthorizedException('Current password is incorrect');
     }
 
@@ -214,7 +228,7 @@ export class UserService {
     this.eventsService.emitUserPasswordUpdated({
       userId: id,
       success: true,
-      metadata: { 
+      metadata: {
         passwordChanged: true,
         timestamp: new Date().toISOString(),
       },

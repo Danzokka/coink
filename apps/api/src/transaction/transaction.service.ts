@@ -19,11 +19,20 @@ export class TransactionService {
 
   async create(userId: string, createTransactionDto: CreateTransactionDto) {
     // Validate category belongs to user
-    await this.validateCategoryOwnership(userId, createTransactionDto.categoryId);
+    await this.validateCategoryOwnership(
+      userId,
+      createTransactionDto.categoryId,
+    );
 
     // If it's an installment transaction, use the installment method
-    if (createTransactionDto.isInstallment && createTransactionDto.totalInstallments) {
-      return this.createInstallmentTransactions(userId, createTransactionDto as CreateInstallmentTransactionDto);
+    if (
+      createTransactionDto.isInstallment &&
+      createTransactionDto.totalInstallments
+    ) {
+      return this.createInstallmentTransactions(
+        userId,
+        createTransactionDto as CreateInstallmentTransactionDto,
+      );
     }
 
     // Calculate amounts if interest or tax rates are provided
@@ -38,8 +47,12 @@ export class TransactionService {
         ...createTransactionDto,
         ...calculatedAmounts,
         userId,
-        date: createTransactionDto.date ? new Date(createTransactionDto.date) : new Date(),
-        dueDate: createTransactionDto.dueDate ? new Date(createTransactionDto.dueDate) : null,
+        date: createTransactionDto.date
+          ? new Date(createTransactionDto.date)
+          : new Date(),
+        dueDate: createTransactionDto.dueDate
+          ? new Date(createTransactionDto.dueDate)
+          : null,
       },
       include: {
         category: {
@@ -55,10 +68,16 @@ export class TransactionService {
     });
   }
 
-  async createInstallmentTransactions(userId: string, createInstallmentDto: CreateInstallmentTransactionDto) {
+  async createInstallmentTransactions(
+    userId: string,
+    createInstallmentDto: CreateInstallmentTransactionDto,
+  ) {
     const installmentGroupId = uuidv4();
-    const baseDate = createInstallmentDto.date ? new Date(createInstallmentDto.date) : new Date();
-    const installmentAmount = createInstallmentDto.amount / createInstallmentDto.totalInstallments;
+    const baseDate = createInstallmentDto.date
+      ? new Date(createInstallmentDto.date)
+      : new Date();
+    const installmentAmount =
+      createInstallmentDto.amount / createInstallmentDto.totalInstallments;
 
     const transactions: any[] = [];
 
@@ -218,19 +237,30 @@ export class TransactionService {
       installmentGroupId,
       transactions,
       totalAmount: transactions.reduce((sum, t) => sum + t.amount, 0),
-      paidAmount: transactions.filter(t => t.isPaid).reduce((sum, t) => sum + t.amount, 0),
-      remainingAmount: transactions.filter(t => !t.isPaid).reduce((sum, t) => sum + t.amount, 0),
+      paidAmount: transactions
+        .filter((t) => t.isPaid)
+        .reduce((sum, t) => sum + t.amount, 0),
+      remainingAmount: transactions
+        .filter((t) => !t.isPaid)
+        .reduce((sum, t) => sum + t.amount, 0),
       totalInstallments: transactions[0].totalInstallments,
-      paidInstallments: transactions.filter(t => t.isPaid).length,
+      paidInstallments: transactions.filter((t) => t.isPaid).length,
     };
   }
 
-  async update(userId: string, id: string, updateTransactionDto: UpdateTransactionDto) {
+  async update(
+    userId: string,
+    id: string,
+    updateTransactionDto: UpdateTransactionDto,
+  ) {
     const transaction = await this.findOne(userId, id);
 
     // If updating category, validate ownership
     if (updateTransactionDto.categoryId) {
-      await this.validateCategoryOwnership(userId, updateTransactionDto.categoryId);
+      await this.validateCategoryOwnership(
+        userId,
+        updateTransactionDto.categoryId,
+      );
     }
 
     // Don't allow updating installment transactions individually if they're part of a group
@@ -242,12 +272,21 @@ export class TransactionService {
 
     // Calculate amounts if interest or tax rates are being updated
     let calculatedAmounts = {};
-    if (updateTransactionDto.amount || updateTransactionDto.interestRate || updateTransactionDto.taxRate) {
+    if (
+      updateTransactionDto.amount ||
+      updateTransactionDto.interestRate ||
+      updateTransactionDto.taxRate
+    ) {
       const amount = updateTransactionDto.amount ?? transaction.amount;
-      const interestRate = updateTransactionDto.interestRate ?? transaction.interestRate;
+      const interestRate =
+        updateTransactionDto.interestRate ?? transaction.interestRate;
       const taxRate = updateTransactionDto.taxRate ?? transaction.taxRate;
-      
-      calculatedAmounts = this.calculateAmounts(amount, interestRate || undefined, taxRate || undefined);
+
+      calculatedAmounts = this.calculateAmounts(
+        amount,
+        interestRate || undefined,
+        taxRate || undefined,
+      );
     }
 
     return this.prisma.transaction.update({
@@ -255,8 +294,12 @@ export class TransactionService {
       data: {
         ...updateTransactionDto,
         ...calculatedAmounts,
-        date: updateTransactionDto.date ? new Date(updateTransactionDto.date) : undefined,
-        dueDate: updateTransactionDto.dueDate ? new Date(updateTransactionDto.dueDate) : undefined,
+        date: updateTransactionDto.date
+          ? new Date(updateTransactionDto.date)
+          : undefined,
+        dueDate: updateTransactionDto.dueDate
+          ? new Date(updateTransactionDto.dueDate)
+          : undefined,
       },
       include: {
         category: {
@@ -300,13 +343,17 @@ export class TransactionService {
       where: { installmentGroupId },
     });
 
-    return { 
+    return {
       message: 'Installment group deleted successfully',
       deletedCount: transactions.length,
     };
   }
 
-  async markInstallmentAsPaid(userId: string, id: string, isPaid: boolean = true) {
+  async markInstallmentAsPaid(
+    userId: string,
+    id: string,
+    isPaid: boolean = true,
+  ) {
     const transaction = await this.findOne(userId, id);
 
     if (!transaction.isInstallment) {
@@ -374,7 +421,9 @@ export class TransactionService {
     });
 
     if (!category) {
-      throw new NotFoundException('Category not found or does not belong to user');
+      throw new NotFoundException(
+        'Category not found or does not belong to user',
+      );
     }
 
     return category;
@@ -384,10 +433,14 @@ export class TransactionService {
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth() + 1;
     const currentYear = currentDate.getFullYear();
-    
+
     // Resumo do mês atual
-    const monthlySum = await this.getMonthlySum(userId, currentYear, currentMonth);
-    
+    const monthlySum = await this.getMonthlySum(
+      userId,
+      currentYear,
+      currentMonth,
+    );
+
     // Transações recentes (últimas 5, mas deduplicadas por parcelamento)
     const allRecentTransactions = await this.prisma.transaction.findMany({
       where: { userId },
@@ -409,7 +462,7 @@ export class TransactionService {
     // Deduplicar transações parceladas (mostrar apenas uma por grupo)
     const seenGroups = new Set();
     const recentTransactions: any[] = [];
-    
+
     for (const transaction of allRecentTransactions) {
       if (transaction.isInstallment && transaction.installmentGroupId) {
         if (!seenGroups.has(transaction.installmentGroupId)) {
@@ -418,16 +471,16 @@ export class TransactionService {
           recentTransactions.push({
             ...transaction,
             description: `${transaction.description} (Parcelado)`,
-            amount: transaction.totalInstallments ? 
-              transaction.amount * transaction.totalInstallments : 
-              transaction.amount,
-            installmentInfo: `${transaction.totalInstallments}x de ${transaction.amount}`
+            amount: transaction.totalInstallments
+              ? transaction.amount * transaction.totalInstallments
+              : transaction.amount,
+            installmentInfo: `${transaction.totalInstallments}x de ${transaction.amount}`,
           });
         }
       } else {
         recentTransactions.push(transaction);
       }
-      
+
       if (recentTransactions.length >= 5) break;
     }
 
@@ -478,22 +531,24 @@ export class TransactionService {
     });
 
     // Buscar nomes das categorias
-    const categoryIds = categoryExpenses.map(exp => exp.categoryId);
+    const categoryIds = categoryExpenses.map((exp) => exp.categoryId);
     const categories = await this.prisma.category.findMany({
       where: { id: { in: categoryIds } },
       select: { id: true, name: true, color: true, icon: true },
     });
 
-    const expensesByCategory = categoryExpenses.map(exp => {
-      const category = categories.find(cat => cat.id === exp.categoryId);
-      return {
-        categoryId: exp.categoryId,
-        categoryName: category?.name || 'Unknown',
-        categoryColor: category?.color || '#gray',
-        categoryIcon: category?.icon || 'circle',
-        amount: exp._sum.amount || 0,
-      };
-    }).sort((a, b) => b.amount - a.amount);
+    const expensesByCategory = categoryExpenses
+      .map((exp) => {
+        const category = categories.find((cat) => cat.id === exp.categoryId);
+        return {
+          categoryId: exp.categoryId,
+          categoryName: category?.name || 'Unknown',
+          categoryColor: category?.color || '#gray',
+          categoryIcon: category?.icon || 'circle',
+          amount: exp._sum.amount || 0,
+        };
+      })
+      .sort((a, b) => b.amount - a.amount);
 
     // Estatísticas gerais
     const totalTransactions = await this.prisma.transaction.count({
@@ -525,7 +580,7 @@ export class TransactionService {
       },
     });
 
-    // Receitas por método de pagamento (mês atual)  
+    // Receitas por método de pagamento (mês atual)
     const incomeByPaymentMethod = await this.prisma.transaction.groupBy({
       by: ['paymentMethod'],
       where: {
@@ -547,14 +602,18 @@ export class TransactionService {
       recentTransactions,
       upcomingInstallments,
       expensesByCategory,
-      expensesByPaymentMethod: expensesByPaymentMethod.map(item => ({
-        paymentMethod: item.paymentMethod,
-        amount: item._sum.amount || 0,
-      })).sort((a, b) => b.amount - a.amount),
-      incomeByPaymentMethod: incomeByPaymentMethod.map(item => ({
-        paymentMethod: item.paymentMethod,
-        amount: item._sum.amount || 0,
-      })).sort((a, b) => b.amount - a.amount),
+      expensesByPaymentMethod: expensesByPaymentMethod
+        .map((item) => ({
+          paymentMethod: item.paymentMethod,
+          amount: item._sum.amount || 0,
+        }))
+        .sort((a, b) => b.amount - a.amount),
+      incomeByPaymentMethod: incomeByPaymentMethod
+        .map((item) => ({
+          paymentMethod: item.paymentMethod,
+          amount: item._sum.amount || 0,
+        }))
+        .sort((a, b) => b.amount - a.amount),
       categoryTrends: await this.getCategoryExpenseTrends(userId),
       incomeTrends: await this.getCategoryIncomeTrends(userId),
       stats: {
@@ -569,14 +628,18 @@ export class TransactionService {
   async getCategoryExpenseTrends(userId: string) {
     const monthsData: any[] = [];
     const currentDate = new Date();
-    
+
     // Últimos 6 meses incluindo o atual
     for (let i = 5; i >= 0; i--) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const date = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - i,
+        1,
+      );
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const monthName = date.toLocaleDateString('pt-BR', { month: 'short' });
-      
+
       // Gastos por categoria neste mês
       const monthlyExpenses = await this.prisma.transaction.groupBy({
         by: ['categoryId'],
@@ -604,8 +667,8 @@ export class TransactionService {
 
     // Buscar todas as categorias que aparecem nos dados
     const allCategoryIds = new Set<string>();
-    monthsData.forEach(monthData => {
-      monthData.expenses.forEach(expense => {
+    monthsData.forEach((monthData) => {
+      monthData.expenses.forEach((expense) => {
         allCategoryIds.add(expense.categoryId);
       });
     });
@@ -616,20 +679,22 @@ export class TransactionService {
     });
 
     // Transformar dados para formato do gráfico
-    const chartData = monthsData.map(monthData => {
+    const chartData = monthsData.map((monthData) => {
       const monthRow: any = { month: monthData.month };
-      
-      categories.forEach(category => {
-        const expense = monthData.expenses.find(e => e.categoryId === category.id);
+
+      categories.forEach((category) => {
+        const expense = monthData.expenses.find(
+          (e) => e.categoryId === category.id,
+        );
         monthRow[category.name] = expense?._sum.amount || 0;
       });
-      
+
       return monthRow;
     });
 
     return {
       chartData,
-      categories: categories.map(cat => ({
+      categories: categories.map((cat) => ({
         id: cat.id,
         name: cat.name,
         color: cat.color || '#8884d8',
@@ -640,14 +705,18 @@ export class TransactionService {
   async getCategoryIncomeTrends(userId: string) {
     const monthsData: any[] = [];
     const currentDate = new Date();
-    
+
     // Últimos 6 meses incluindo o atual
     for (let i = 5; i >= 0; i--) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const date = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - i,
+        1,
+      );
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const monthName = date.toLocaleDateString('pt-BR', { month: 'short' });
-      
+
       // Receitas por categoria neste mês
       const monthlyIncomes = await this.prisma.transaction.groupBy({
         by: ['categoryId'],
@@ -675,35 +744,37 @@ export class TransactionService {
 
     // Buscar todas as categorias que aparecem nos dados
     const allCategoryIds = new Set<string>();
-    monthsData.forEach(monthData => {
-      monthData.incomes.forEach(income => {
+    monthsData.forEach((monthData) => {
+      monthData.incomes.forEach((income) => {
         allCategoryIds.add(income.categoryId);
       });
     });
 
     const categories = await this.prisma.category.findMany({
-      where: { 
+      where: {
         id: { in: Array.from(allCategoryIds) },
-        type: 'INCOME'
+        type: 'INCOME',
       },
       select: { id: true, name: true, color: true },
     });
 
     // Transformar dados para formato do gráfico
-    const chartData = monthsData.map(monthData => {
+    const chartData = monthsData.map((monthData) => {
       const monthRow: any = { month: monthData.month };
-      
-      categories.forEach(category => {
-        const income = monthData.incomes.find(i => i.categoryId === category.id);
+
+      categories.forEach((category) => {
+        const income = monthData.incomes.find(
+          (i) => i.categoryId === category.id,
+        );
         monthRow[category.name] = income?._sum.amount || 0;
       });
-      
+
       return monthRow;
     });
 
     return {
       chartData,
-      categories: categories.map(cat => ({
+      categories: categories.map((cat) => ({
         id: cat.id,
         name: cat.name,
         color: cat.color || '#22c55e',
@@ -797,11 +868,7 @@ export class TransactionService {
             },
           },
         },
-        orderBy: [
-          { dueDate: 'desc' },
-          { date: 'desc' },
-          { createdAt: 'desc' },
-        ],
+        orderBy: [{ dueDate: 'desc' }, { date: 'desc' }, { createdAt: 'desc' }],
         skip,
         take: limit,
       }),
@@ -847,7 +914,11 @@ export class TransactionService {
     };
   }
 
-  private calculateAmounts(amount: number, interestRate?: number, taxRate?: number) {
+  private calculateAmounts(
+    amount: number,
+    interestRate?: number,
+    taxRate?: number,
+  ) {
     let originalAmount = amount;
     let finalAmount = amount;
 

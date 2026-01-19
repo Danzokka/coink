@@ -128,7 +128,7 @@ export interface UserProfileUpdatedEvent {
 }
 
 // Union type para todos os eventos
-export type AppEvent = 
+export type AppEvent =
   | TransactionCreatedEvent
   | TransactionUpdatedEvent
   | TransactionDeletedEvent
