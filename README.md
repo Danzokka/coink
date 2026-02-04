@@ -1,28 +1,88 @@
-# Turborepo starter
+# Coink - Sistema de Gestão Financeira
 
-This Turborepo starter is maintained by the Turborepo core team.
+Sistema de gestão financeira pessoal com categorização inteligente e insights valiosos.
 
-## Using this example
+## Stack
 
-Run the following command:
+- **Monorepo**: Turborepo + pnpm
+- **Frontend**: Next.js 16 + React 19 + TailwindCSS v4
+- **Backend**: NestJS 11 + Prisma ORM
+- **Database**: PostgreSQL 17
+- **Cache**: Redis (latest)
+- **Containerização**: Docker + Docker Compose
 
-```sh
-npx create-turbo@latest
+## Quick Start
+
+### Usando Docker (Recomendado)
+
+1. **Configure o ambiente**:
+```bash
+cp .env.example .env
+# Edite .env e ajuste as variáveis
 ```
 
-## What's inside?
+2. **Suba os containers**:
+```bash
+docker compose up -d --build
+```
+
+3. **Acesse**:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5000
+
+📖 Para mais detalhes sobre Docker, veja [DOCKER.md](./DOCKER.md)
+
+### Desenvolvimento Local
+
+1. **Instale dependências**:
+```bash
+pnpm install
+```
+
+2. **Configure o ambiente**:
+```bash
+# Backend
+cd apps/api
+cp .env.example .env
+# Edite .env com suas configurações locais
+
+# Frontend
+cd apps/web
+cp .env.example .env
+# Edite .env com suas configurações locais
+```
+
+3. **Suba PostgreSQL e Redis** (via Docker):
+```bash
+docker compose up -d postgres redis
+```
+
+4. **Execute migrations**:
+```bash
+cd apps/api
+pnpm run db:migrate
+pnpm run db:seed  # (opcional) popular com dados de exemplo
+```
+
+5. **Inicie o desenvolvimento**:
+```bash
+# Na raiz do projeto
+pnpm dev
+```
+
+## Estrutura do Projeto
 
 This Turborepo includes the following packages/apps:
 
 ### Apps and Packages
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- `apps/web`: Frontend Next.js 16 com React 19
+- `apps/api`: Backend NestJS 11 com Prisma
+- `packages/ui`: Biblioteca de componentes React compartilhados
+- `packages/eslint-config`: Configurações ESLint compartilhadas
+- `packages/typescript-config`: Configurações TypeScript compartilhadas
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+Cada package/app é 100% [TypeScript](https://www.typescriptlang.org/).
 
 ### Utilities
 
@@ -34,102 +94,166 @@ This Turborepo has some additional tools already setup for you:
 
 ### Build
 
-To build all apps and packages, run the following command:
+Build todos os apps e packages:
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+pnpm build
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Build de um app específico:
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+```bash
+pnpm build --filter=web   # Frontend
+pnpm build --filter=api   # Backend
 ```
 
-### Develop
+### Desenvolvimento
 
-To develop all apps and packages, run the following command:
+Desenvolver todos os apps:
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+```bash
+pnpm dev
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Desenvolver um app específico:
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+pnpm dev --filter=web   # Frontend (porta 3000)
+pnpm dev --filter=api   # Backend (porta 5000)
 ```
 
-### Remote Caching
+## Comandos Úteis
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+### Backend (NestJS + Prisma)
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+```bash
+cd apps/api
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+# Prisma
+pnpm run db:generate    # Gerar Prisma Client
+pnpm run db:push        # Sincronizar schema (dev)
+pnpm run db:migrate     # Criar/executar migrations
+pnpm run db:studio      # Abrir Prisma Studio
+pnpm run db:seed        # Popular banco com dados
 
-```
-cd my-turborepo
+# Testes
+pnpm test               # Testes unitários
+pnpm test:e2e           # Testes E2E
+pnpm test:cov           # Cobertura de testes
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+# Build e produção
+pnpm build              # Build para produção
+pnpm start:prod         # Executar em produção
 ```
 
-## Useful Links
+### Frontend (Next.js)
 
-Learn more about the power of Turborepo:
+```bash
+cd apps/web
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+# Build e produção
+pnpm build              # Build para produção
+pnpm start              # Executar build de produção
+
+# Testes
+pnpm test               # Testes com Jest
+pnpm test:watch         # Watch mode
+```
+
+## Variáveis de Ambiente
+
+O projeto usa um único arquivo `.env` na raiz para Docker. Para desenvolvimento local, cada app tem seu próprio `.env`:
+
+- **Raiz** (`/.env`): Usado pelo Docker Compose
+- **Backend** (`/apps/api/.env`): Desenvolvimento local do backend
+- **Frontend** (`/apps/web/.env`): Desenvolvimento local do frontend
+
+### Variáveis necessárias
+
+#### Backend
+```bash
+DATABASE_URL=postgresql://user:password@localhost:5432/coink
+REDIS_URL=redis://localhost:6379
+JWT_SECRET=seu-secret-aqui
+PORT=5000
+```
+
+#### Frontend
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=seu-nextauth-secret
+```
+
+## Docker
+
+Para executar a aplicação completa com Docker:
+
+```bash
+# Configurar ambiente
+cp .env.example .env
+
+# Subir containers
+docker compose up -d --build
+
+# Ver logs
+docker compose logs -f
+
+# Parar containers
+docker compose down
+```
+
+📖 **Guia completo**: [DOCKER.md](./DOCKER.md)
+
+## Arquitetura
+
+```
+┌─────────────────┐
+│   coink-web     │  Next.js 16 Frontend
+│   (Port 3000)   │  React 19 + TailwindCSS v4
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   coink-api     │  NestJS 11 Backend
+│   (Port 5000)   │  Prisma ORM + Redis Cache
+└────┬─────┬──────┘
+     │     │
+     ▼     ▼
+┌─────────┐ ┌─────────┐
+│PostgreSQL│ │  Redis  │
+│   :5432  │ │  :6379  │
+└─────────┘ └─────────┘
+```
+
+### Volumes
+
+- `postgres_data`: Persistência do PostgreSQL
+- `redis_data`: Persistência do Redis
+- `coink_files`: Arquivos da aplicação (uploads, etc.)
+
+## Contribuindo
+
+1. Faça fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/amazing-feature`)
+3. Commit suas mudanças (`git commit -m 'Add amazing feature'`)
+4. Push para a branch (`git push origin feature/amazing-feature`)
+5. Abra um Pull Request
+
+## Links Úteis
+
+### Documentação
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [NestJS Documentation](https://docs.nestjs.com/)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [Turborepo Documentation](https://turborepo.com/docs)
+
+### Projeto
+
+- [Guia Docker](./DOCKER.md)
+- [Diagramas de Arquitetura](./docs/diagrams/)
+
+## Licença
+
+[Adicionar licença aqui]

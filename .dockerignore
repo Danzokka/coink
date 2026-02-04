@@ -1,0 +1,68 @@
+# Git
+.git
+.gitignore
+
+# Node modules
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+build
+.next
+**/.next
+**/dist
+**/build
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files (passados via env_file no docker-compose)
+.env
+.env.*
+!.env.example
+
+# Database
+*.db
+*.db-journal
+apps/api/prisma/database.db
+
+# Tests
+coverage
+.nyc_output
+**/__tests__
+**/*.test.ts
+**/*.spec.ts
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+*.md
+!README.md
+docs
+
+# CI/CD
+.github
+
+# Cache
+.turbo
+.cache
+**/.cache
