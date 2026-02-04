@@ -38,6 +38,9 @@ COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/apps/api /app/apps/api
 COPY --from=builder /app/packages /app/packages
 
+# Garantir que o build da API (dist) esteja no runner (evita MODULE_NOT_FOUND)
+COPY --from=builder /app/apps/api/dist /app/apps/api/dist
+
 # Prisma schema and migrations for runtime migrate
 COPY --from=builder /app/apps/api/prisma /app/apps/api/prisma
 

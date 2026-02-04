@@ -1,14 +1,23 @@
-import { PrismaClient, TransactionType, PaymentMethod } from '@prisma/client';
+import 'dotenv/config';
+import {
+  PrismaClient,
+  TransactionType,
+  PaymentMethod,
+} from './generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import * as bcrypt from 'bcrypt';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('🌱 Iniciando seed do banco de dados...');
 
   // Criar usuário padrão
   const hashedPassword = await bcrypt.hash('123456', 12);
-  
+
   const user = await prisma.user.upsert({
     where: { email: 'demo@coink.com' },
     update: {},
@@ -25,12 +34,12 @@ async function main() {
   // Criar categorias padrão para despesas
   const expenseCategories = await Promise.all([
     prisma.category.upsert({
-      where: { 
-        name_userId_type: { 
-          name: 'Alimentação', 
-          userId: user.id, 
-          type: TransactionType.EXPENSE 
-        } 
+      where: {
+        name_userId_type: {
+          name: 'Alimentação',
+          userId: user.id,
+          type: TransactionType.EXPENSE,
+        },
       },
       update: {},
       create: {
@@ -44,12 +53,12 @@ async function main() {
       },
     }),
     prisma.category.upsert({
-      where: { 
-        name_userId_type: { 
-          name: 'Transporte', 
-          userId: user.id, 
-          type: TransactionType.EXPENSE 
-        } 
+      where: {
+        name_userId_type: {
+          name: 'Transporte',
+          userId: user.id,
+          type: TransactionType.EXPENSE,
+        },
       },
       update: {},
       create: {
@@ -63,12 +72,12 @@ async function main() {
       },
     }),
     prisma.category.upsert({
-      where: { 
-        name_userId_type: { 
-          name: 'Assinaturas', 
-          userId: user.id, 
-          type: TransactionType.EXPENSE 
-        } 
+      where: {
+        name_userId_type: {
+          name: 'Assinaturas',
+          userId: user.id,
+          type: TransactionType.EXPENSE,
+        },
       },
       update: {},
       create: {
@@ -82,12 +91,12 @@ async function main() {
       },
     }),
     prisma.category.upsert({
-      where: { 
-        name_userId_type: { 
-          name: 'Saúde', 
-          userId: user.id, 
-          type: TransactionType.EXPENSE 
-        } 
+      where: {
+        name_userId_type: {
+          name: 'Saúde',
+          userId: user.id,
+          type: TransactionType.EXPENSE,
+        },
       },
       update: {},
       create: {
@@ -101,12 +110,12 @@ async function main() {
       },
     }),
     prisma.category.upsert({
-      where: { 
-        name_userId_type: { 
-          name: 'Casa', 
-          userId: user.id, 
-          type: TransactionType.EXPENSE 
-        } 
+      where: {
+        name_userId_type: {
+          name: 'Casa',
+          userId: user.id,
+          type: TransactionType.EXPENSE,
+        },
       },
       update: {},
       create: {
@@ -120,12 +129,12 @@ async function main() {
       },
     }),
     prisma.category.upsert({
-      where: { 
-        name_userId_type: { 
-          name: 'Entretenimento', 
-          userId: user.id, 
-          type: TransactionType.EXPENSE 
-        } 
+      where: {
+        name_userId_type: {
+          name: 'Entretenimento',
+          userId: user.id,
+          type: TransactionType.EXPENSE,
+        },
       },
       update: {},
       create: {
@@ -143,12 +152,12 @@ async function main() {
   // Criar categorias padrão para receitas
   const incomeCategories = await Promise.all([
     prisma.category.upsert({
-      where: { 
-        name_userId_type: { 
-          name: 'Salário', 
-          userId: user.id, 
-          type: TransactionType.INCOME 
-        } 
+      where: {
+        name_userId_type: {
+          name: 'Salário',
+          userId: user.id,
+          type: TransactionType.INCOME,
+        },
       },
       update: {},
       create: {
@@ -162,12 +171,12 @@ async function main() {
       },
     }),
     prisma.category.upsert({
-      where: { 
-        name_userId_type: { 
-          name: 'Freelance', 
-          userId: user.id, 
-          type: TransactionType.INCOME 
-        } 
+      where: {
+        name_userId_type: {
+          name: 'Freelance',
+          userId: user.id,
+          type: TransactionType.INCOME,
+        },
       },
       update: {},
       create: {
@@ -181,12 +190,12 @@ async function main() {
       },
     }),
     prisma.category.upsert({
-      where: { 
-        name_userId_type: { 
-          name: 'Investimentos', 
-          userId: user.id, 
-          type: TransactionType.INCOME 
-        } 
+      where: {
+        name_userId_type: {
+          name: 'Investimentos',
+          userId: user.id,
+          type: TransactionType.INCOME,
+        },
       },
       update: {},
       create: {
@@ -201,25 +210,33 @@ async function main() {
     }),
   ]);
 
-  console.log('🏷️ Categorias criadas:', [...expenseCategories, ...incomeCategories].length);
+  console.log(
+    '🏷️ Categorias criadas:',
+    [...expenseCategories, ...incomeCategories].length,
+  );
 
   console.log('💰 Criando transações abrangentes para dashboard completo...');
 
   // Função helper para criar transações de um mês específico
-  const createMonthlyTransactions = async (monthIndex: number, year: number = 2024) => {
+  const createMonthlyTransactions = async (
+    monthIndex: number,
+    year: number = 2024,
+  ) => {
     const transactions: Array<Promise<any>> = [];
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
-    
+
     // Se estamos no futuro, incluir parcelas e assinaturas
-    const isCurrentOrPastMonth = year < currentYear || (year === currentYear && monthIndex <= currentMonth);
+    const isCurrentOrPastMonth =
+      year < currentYear ||
+      (year === currentYear && monthIndex <= currentMonth);
 
     // Receitas mensais (Salário sempre no dia 5)
     transactions.push(
       prisma.transaction.create({
         data: {
           description: `Salário ${monthIndex + 1}/${year}`,
-          amount: 4500.00 + (Math.random() * 200 - 100), // Variação de ±100
+          amount: 4500.0 + (Math.random() * 200 - 100), // Variação de ±100
           type: TransactionType.INCOME,
           paymentMethod: PaymentMethod.BANK_TRANSFER,
           date: new Date(year, monthIndex, 5),
@@ -230,7 +247,7 @@ async function main() {
           userId: user.id,
           categoryId: incomeCategories[0].id, // Salário
         },
-      })
+      }),
     );
 
     // Freelance ocasional (30% chance por mês)
@@ -242,23 +259,31 @@ async function main() {
             amount: 800 + Math.random() * 1200, // Entre 800-2000
             type: TransactionType.INCOME,
             paymentMethod: PaymentMethod.PIX,
-            date: new Date(year, monthIndex, Math.floor(Math.random() * 28) + 1),
-            dueDate: new Date(year, monthIndex, Math.floor(Math.random() * 28) + 1),
+            date: new Date(
+              year,
+              monthIndex,
+              Math.floor(Math.random() * 28) + 1,
+            ),
+            dueDate: new Date(
+              year,
+              monthIndex,
+              Math.floor(Math.random() * 28) + 1,
+            ),
             isPaid: isCurrentOrPastMonth,
             userId: user.id,
             categoryId: incomeCategories[1].id, // Freelance
           },
-        })
+        }),
       );
     }
 
     // Assinaturas mensais (sempre recorrentes)
     const subscriptions = [
-      { name: 'Netflix Premium', amount: 45.90, day: 10 },
-      { name: 'Spotify Individual', amount: 21.90, day: 15 },
-      { name: 'Amazon Prime', amount: 14.90, day: 8 },
-      { name: 'Microsoft 365', amount: 32.00, day: 20 },
-      { name: 'Adobe Creative', amount: 89.90, day: 12 },
+      { name: 'Netflix Premium', amount: 45.9, day: 10 },
+      { name: 'Spotify Individual', amount: 21.9, day: 15 },
+      { name: 'Amazon Prime', amount: 14.9, day: 8 },
+      { name: 'Microsoft 365', amount: 32.0, day: 20 },
+      { name: 'Adobe Creative', amount: 89.9, day: 12 },
     ];
 
     for (const sub of subscriptions) {
@@ -277,7 +302,7 @@ async function main() {
             userId: user.id,
             categoryId: expenseCategories[2].id, // Assinaturas
           },
-        })
+        }),
       );
     }
 
@@ -285,14 +310,18 @@ async function main() {
     const houseBills = [
       { name: 'Conta de Luz', amount: 140 + Math.random() * 60, day: 18 },
       { name: 'Conta de Água', amount: 80 + Math.random() * 40, day: 22 },
-      { name: 'Internet Fibra', amount: 99.90, day: 12 },
-      { name: 'Gás de Cozinha', amount: 110, day: Math.floor(Math.random() * 28) + 1 },
+      { name: 'Internet Fibra', amount: 99.9, day: 12 },
+      {
+        name: 'Gás de Cozinha',
+        amount: 110,
+        day: Math.floor(Math.random() * 28) + 1,
+      },
     ];
 
     for (const bill of houseBills) {
       // Gás é ocasional (20% chance)
       if (bill.name === 'Gás de Cozinha' && Math.random() > 0.2) continue;
-      
+
       transactions.push(
         prisma.transaction.create({
           data: {
@@ -306,7 +335,7 @@ async function main() {
             userId: user.id,
             categoryId: expenseCategories[4].id, // Casa
           },
-        })
+        }),
       );
     }
 
@@ -319,7 +348,9 @@ async function main() {
     // Supermercado (2-3 vezes por mês)
     for (let i = 0; i < 2 + Math.floor(Math.random() * 2); i++) {
       foodExpenses.push({
-        description: ['Supermercado Extra', 'Pão de Açúcar', 'Carrefour'][Math.floor(Math.random() * 3)],
+        description: ['Supermercado Extra', 'Pão de Açúcar', 'Carrefour'][
+          Math.floor(Math.random() * 3)
+        ],
         amount: 150 + Math.random() * 200,
         method: PaymentMethod.DEBIT_CARD,
       });
@@ -327,9 +358,18 @@ async function main() {
     // Restaurantes (3-6 vezes por mês)
     for (let i = 0; i < 3 + Math.floor(Math.random() * 4); i++) {
       foodExpenses.push({
-        description: ['Restaurante do João', 'iFood - Pizza', 'Lanchonete Central', 'Padaria São Bento'][Math.floor(Math.random() * 4)],
+        description: [
+          'Restaurante do João',
+          'iFood - Pizza',
+          'Lanchonete Central',
+          'Padaria São Bento',
+        ][Math.floor(Math.random() * 4)],
         amount: 25 + Math.random() * 75,
-        method: [PaymentMethod.PIX, PaymentMethod.DEBIT_CARD, PaymentMethod.CREDIT_CARD][Math.floor(Math.random() * 3)],
+        method: [
+          PaymentMethod.PIX,
+          PaymentMethod.DEBIT_CARD,
+          PaymentMethod.CREDIT_CARD,
+        ][Math.floor(Math.random() * 3)],
       });
     }
 
@@ -341,13 +381,21 @@ async function main() {
             amount: food.amount,
             type: TransactionType.EXPENSE,
             paymentMethod: food.method,
-            date: new Date(year, monthIndex, Math.floor(Math.random() * 28) + 1),
-            dueDate: new Date(year, monthIndex, Math.floor(Math.random() * 28) + 1),
+            date: new Date(
+              year,
+              monthIndex,
+              Math.floor(Math.random() * 28) + 1,
+            ),
+            dueDate: new Date(
+              year,
+              monthIndex,
+              Math.floor(Math.random() * 28) + 1,
+            ),
             isPaid: isCurrentOrPastMonth,
             userId: user.id,
             categoryId: expenseCategories[0].id, // Alimentação
           },
-        })
+        }),
       );
     }
 
@@ -360,17 +408,25 @@ async function main() {
     // Combustível (2-4 vezes por mês)
     for (let i = 0; i < 2 + Math.floor(Math.random() * 3); i++) {
       transportExpenses.push({
-        description: ['Shell', 'Posto Ipiranga', 'BR Distribuidora'][Math.floor(Math.random() * 3)],
+        description: ['Shell', 'Posto Ipiranga', 'BR Distribuidora'][
+          Math.floor(Math.random() * 3)
+        ],
         amount: 70 + Math.random() * 40,
-        method: [PaymentMethod.PIX, PaymentMethod.DEBIT_CARD][Math.floor(Math.random() * 2)],
+        method: [PaymentMethod.PIX, PaymentMethod.DEBIT_CARD][
+          Math.floor(Math.random() * 2)
+        ],
       });
     }
     // Uber/transporte público
     for (let i = 0; i < Math.floor(Math.random() * 8); i++) {
       transportExpenses.push({
-        description: ['Uber', '99Pop', 'Bilhete Único'][Math.floor(Math.random() * 3)],
+        description: ['Uber', '99Pop', 'Bilhete Único'][
+          Math.floor(Math.random() * 3)
+        ],
         amount: 15 + Math.random() * 35,
-        method: [PaymentMethod.PIX, PaymentMethod.CREDIT_CARD][Math.floor(Math.random() * 2)],
+        method: [PaymentMethod.PIX, PaymentMethod.CREDIT_CARD][
+          Math.floor(Math.random() * 2)
+        ],
       });
     }
 
@@ -382,13 +438,21 @@ async function main() {
             amount: transport.amount,
             type: TransactionType.EXPENSE,
             paymentMethod: transport.method,
-            date: new Date(year, monthIndex, Math.floor(Math.random() * 28) + 1),
-            dueDate: new Date(year, monthIndex, Math.floor(Math.random() * 28) + 1),
+            date: new Date(
+              year,
+              monthIndex,
+              Math.floor(Math.random() * 28) + 1,
+            ),
+            dueDate: new Date(
+              year,
+              monthIndex,
+              Math.floor(Math.random() * 28) + 1,
+            ),
             isPaid: isCurrentOrPastMonth,
             userId: user.id,
             categoryId: expenseCategories[1].id, // Transporte
           },
-        })
+        }),
       );
     }
 
@@ -399,22 +463,35 @@ async function main() {
         { name: 'Farmácia', amount: 30 + Math.random() * 70 },
         { name: 'Exames Laboratoriais', amount: 80 + Math.random() * 120 },
       ];
-      
-      for (const health of healthExpenses.slice(0, Math.floor(Math.random() * 2) + 1)) {
+
+      for (const health of healthExpenses.slice(
+        0,
+        Math.floor(Math.random() * 2) + 1,
+      )) {
         transactions.push(
           prisma.transaction.create({
             data: {
               description: health.name,
               amount: health.amount,
               type: TransactionType.EXPENSE,
-              paymentMethod: [PaymentMethod.CREDIT_CARD, PaymentMethod.PIX][Math.floor(Math.random() * 2)],
-              date: new Date(year, monthIndex, Math.floor(Math.random() * 28) + 1),
-              dueDate: new Date(year, monthIndex, Math.floor(Math.random() * 28) + 1),
+              paymentMethod: [PaymentMethod.CREDIT_CARD, PaymentMethod.PIX][
+                Math.floor(Math.random() * 2)
+              ],
+              date: new Date(
+                year,
+                monthIndex,
+                Math.floor(Math.random() * 28) + 1,
+              ),
+              dueDate: new Date(
+                year,
+                monthIndex,
+                Math.floor(Math.random() * 28) + 1,
+              ),
               isPaid: isCurrentOrPastMonth,
               userId: user.id,
               categoryId: expenseCategories[3].id, // Saúde
             },
-          })
+          }),
         );
       }
     }
@@ -428,22 +505,37 @@ async function main() {
         { name: 'Bar com amigos', amount: 60 + Math.random() * 80 },
         { name: 'Steam - Jogos', amount: 30 + Math.random() * 70 },
       ];
-      
-      for (const entertainment of entertainmentExpenses.slice(0, Math.floor(Math.random() * 3) + 1)) {
+
+      for (const entertainment of entertainmentExpenses.slice(
+        0,
+        Math.floor(Math.random() * 3) + 1,
+      )) {
         transactions.push(
           prisma.transaction.create({
             data: {
               description: entertainment.name,
               amount: entertainment.amount,
               type: TransactionType.EXPENSE,
-              paymentMethod: [PaymentMethod.CREDIT_CARD, PaymentMethod.PIX, PaymentMethod.DEBIT_CARD][Math.floor(Math.random() * 3)],
-              date: new Date(year, monthIndex, Math.floor(Math.random() * 28) + 1),
-              dueDate: new Date(year, monthIndex, Math.floor(Math.random() * 28) + 1),
+              paymentMethod: [
+                PaymentMethod.CREDIT_CARD,
+                PaymentMethod.PIX,
+                PaymentMethod.DEBIT_CARD,
+              ][Math.floor(Math.random() * 3)],
+              date: new Date(
+                year,
+                monthIndex,
+                Math.floor(Math.random() * 28) + 1,
+              ),
+              dueDate: new Date(
+                year,
+                monthIndex,
+                Math.floor(Math.random() * 28) + 1,
+              ),
               isPaid: isCurrentOrPastMonth,
               userId: user.id,
               categoryId: expenseCategories[5].id, // Entretenimento
             },
-          })
+          }),
         );
       }
     }
@@ -460,7 +552,10 @@ async function main() {
   // Últimos 8 meses
   for (let i = -8; i <= 4; i++) {
     const date = new Date(currentYear, currentMonth + i, 1);
-    const monthTransactions = await createMonthlyTransactions(date.getMonth(), date.getFullYear());
+    const monthTransactions = await createMonthlyTransactions(
+      date.getMonth(),
+      date.getFullYear(),
+    );
     totalTransactions = [...totalTransactions, ...monthTransactions];
   }
 
@@ -468,7 +563,7 @@ async function main() {
 
   // Criar transação parcelada de exemplo
   const installmentGroupId = `installment_${Date.now()}`;
-  const totalAmount = 1200.00;
+  const totalAmount = 1200.0;
   const installments = 12;
   const monthlyAmount = totalAmount / installments;
 
@@ -497,7 +592,10 @@ async function main() {
     installmentTransactions.push(installment);
   }
 
-  console.log('📱 Transações parceladas criadas:', installmentTransactions.length);
+  console.log(
+    '📱 Transações parceladas criadas:',
+    installmentTransactions.length,
+  );
 
   console.log('✅ Seed concluído!');
   console.log('📧 Email: demo@coink.com');
