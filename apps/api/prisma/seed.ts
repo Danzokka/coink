@@ -1,9 +1,5 @@
 import 'dotenv/config';
-import {
-  PrismaClient,
-  TransactionType,
-  PaymentMethod,
-} from './generated/prisma/client';
+import { PrismaClient, TransactionType, PaymentMethod } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import * as bcrypt from 'bcrypt';
 

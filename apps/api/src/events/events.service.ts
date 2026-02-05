@@ -7,7 +7,7 @@ import {
   CreateEventsDto,
   EventQueryDto,
 } from './dto/event.dto';
-import { EventType } from '@prisma/client';
+import { EventType } from 'prisma/generated/prisma/enums';
 import {
   TransactionCreatedEvent,
   TransactionUpdatedEvent,
