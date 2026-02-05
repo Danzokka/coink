@@ -4,7 +4,7 @@ import { TransactionService } from './transaction.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { TransactionFilterDto } from './dto/transaction-filter.dto';
-import { TransactionType, PaymentMethod } from '@prisma/client';
+import { TransactionType, PaymentMethod } from '../prisma-client';
 
 describe('TransactionController', () => {
   let controller: TransactionController;

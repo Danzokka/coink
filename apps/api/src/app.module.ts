@@ -16,9 +16,11 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    PrismaModule,
-    CacheModule,
+    ConfigModule.forRoot({
+      isGlobal: true, // Try multiple locations so both package cwd and repository root .env are loaded in dev.
+      // Order: package .env, repo root .env
+      envFilePath: ['.env', '../../.env', '../.env'],
+    }),
     EventEmitterModule,
     UserModule,
     AuthModule,

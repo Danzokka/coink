@@ -13,7 +13,7 @@ import {
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { TransactionType } from '@prisma/client';
+import { TransactionType } from '../prisma-client';
 
 @Controller('categories')
 @UseGuards(AuthGuard)

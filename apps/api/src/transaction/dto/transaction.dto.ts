@@ -14,7 +14,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { TransactionType, PaymentMethod } from '@prisma/client';
+import { TransactionType, PaymentMethod } from '../../prisma-client';
 
 export class CreateTransactionDto {
   @IsString()

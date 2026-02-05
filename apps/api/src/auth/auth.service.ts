@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { User } from '../prisma-client';
 import { UserService } from '../user/user.service';
 import { AuthUserDto } from '../user/dto/user.dto';
 import * as bcrypt from 'bcrypt';

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionService } from './transaction.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { TransactionType, PaymentMethod } from '@prisma/client';
+import { TransactionType, PaymentMethod } from '../prisma-client';
 
 describe('TransactionService', () => {
   let service: TransactionService;

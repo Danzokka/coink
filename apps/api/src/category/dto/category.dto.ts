@@ -8,7 +8,7 @@ import {
   Length,
   Matches,
 } from 'class-validator';
-import { TransactionType } from '@prisma/client';
+import { TransactionType } from '../../prisma-client';
 
 export class CreateCategoryDto {
   @IsString()

@@ -7,7 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { EventType } from '@prisma/client';
+import { EventType } from '../../prisma-client';
 
 export class CreateEventDto {
   @IsEnum(EventType)
